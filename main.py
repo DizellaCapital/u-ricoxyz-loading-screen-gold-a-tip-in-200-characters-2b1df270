@@ -17,15 +17,21 @@ LINE = (
 )
 
 
+def validate(line):
+    """Check the tip fits the loading-screen gate: one ASCII line, 1-200 chars."""
+    if not 1 <= len(line) <= 200:
+        return f"entry must be 1-200 chars, got {len(line)}"
+    if not line.strip() or "\n" in line or "\r" in line:
+        return "entry must be a single non-blank line"
+    if any(ord(ch) > 127 for ch in line):
+        return "entry must be ASCII"
+    return None
+
+
 def main():
-    if not 1 <= len(LINE) <= 200:
-        print(f"entry must be 1-200 chars, got {len(LINE)}", file=sys.stderr)
-        return 1
-    if not LINE.strip() or "\n" in LINE or "\r" in LINE:
-        print("entry must be a single non-blank line", file=sys.stderr)
-        return 1
-    if any(ord(ch) > 127 for ch in LINE):
-        print("entry must be ASCII", file=sys.stderr)
+    problem = validate(LINE)
+    if problem:
+        print(problem, file=sys.stderr)
         return 1
     out_dir = os.environ.get("MAKEFUN_OUTPUT_DIR", "/output")
     os.makedirs(out_dir, exist_ok=True)
